@@ -1,6 +1,7 @@
 cmake_minimum_required( VERSION 3.10 FATAL_ERROR )
 
 set( CINDER_PLATFORM "Cocoa" )
+set( CMAKE_OSX_DEPLOYMENT_TARGET "10.13" CACHE STRING "Minimum OS X deployment version" FORCE )
 
 # append mac specific source files
 list( APPEND SRC_SET_COCOA
@@ -162,4 +163,3 @@ list( APPEND CINDER_SKIP_SAMPLES
 	_opengl/ParticleSphereCS
 	_opengl/NVidiaComputeParticles
 )
-
