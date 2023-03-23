@@ -439,14 +439,6 @@ int System::getNumCores()
 	return instance()->mLogicalCPUs;
 }
 
-#if defined( CINDER_COCOA )
-typedef struct {
-	NSInteger majorVersion;
-	NSInteger minorVersion;
-	NSInteger patchVersion;
-} ShadowOSVersion;
-#endif
-
 int System::getOsMajorVersion()
 {
 	if( ! instance()->mCachedValues[OS_MAJOR] ) {
@@ -454,16 +446,8 @@ int System::getOsMajorVersion()
 		NSArray *sysVerComponents = [[[UIDevice currentDevice] systemVersion] componentsSeparatedByString:@"."];
 		instance()->mOSMajorVersion = [[sysVerComponents firstObject] intValue];
 #elif defined( CINDER_MAC )
-		if( [[NSProcessInfo processInfo] respondsToSelector:@selector(operatingSystemVersion)] ) {
-			ShadowOSVersion version = ((ShadowOSVersion(*)(id, SEL))objc_msgSend_stret)([NSProcessInfo processInfo], @selector(operatingSystemVersion));
-			instance()->mOSMajorVersion = (int32_t)version.majorVersion;
-		} else {
-	#pragma clang diagnostic push
-	#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-			if( Gestalt(gestaltSystemVersionMajor, reinterpret_cast<SInt32*>( &(instance()->mOSMajorVersion) ) ) != noErr )
-				throw SystemExcFailedQuery();
-	#pragma clang diagnostic pop
-		}
+		NSOperatingSystemVersion version = [[NSProcessInfo processInfo] operatingSystemVersion];
+		instance()->mOSMajorVersion = (int32_t)version.majorVersion;
 #elif defined( CINDER_MSW_DESKTOP )
 		::OSVERSIONINFOEX info;
 		::ZeroMemory( &info, sizeof( OSVERSIONINFOEX ) );
@@ -486,16 +470,8 @@ int System::getOsMinorVersion()
 		NSArray *sysVerComponents = [[[UIDevice currentDevice] systemVersion] componentsSeparatedByString:@"."];
 		instance()->mOSMinorVersion = [[sysVerComponents objectAtIndex:1] intValue];
 #elif defined( CINDER_MAC )
-		if( [[NSProcessInfo processInfo] respondsToSelector:@selector(operatingSystemVersion)] ) {
-			ShadowOSVersion version = ((ShadowOSVersion(*)(id, SEL))objc_msgSend_stret)([NSProcessInfo processInfo], @selector(operatingSystemVersion));
-			instance()->mOSMinorVersion = (int32_t)version.minorVersion;
-		} else {
-	#pragma clang diagnostic push
-	#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-			if( Gestalt(gestaltSystemVersionMinor, reinterpret_cast<SInt32*>( &(instance()->mOSMinorVersion) ) ) != noErr )
-				throw SystemExcFailedQuery();
-	#pragma clang diagnostic pop
-		}
+		NSOperatingSystemVersion version = [[NSProcessInfo processInfo] operatingSystemVersion];
+		instance()->mOSMinorVersion = (int32_t)version.minorVersion;
 #elif defined( CINDER_MSW_DESKTOP )
 		::OSVERSIONINFOEX info;
 		::ZeroMemory( &info, sizeof( OSVERSIONINFOEX ) );
@@ -521,16 +497,8 @@ int System::getOsBugFixVersion()
 		else
 			instance()->mOSBugFixVersion = 0;
 #elif defined( CINDER_MAC )
-		if( [[NSProcessInfo processInfo] respondsToSelector:@selector(operatingSystemVersion)] ) {
-			ShadowOSVersion version = ((ShadowOSVersion(*)(id, SEL))objc_msgSend_stret)([NSProcessInfo processInfo], @selector(operatingSystemVersion));
-			instance()->mOSBugFixVersion = (int32_t)version.patchVersion;
-		} else {
-	#pragma clang diagnostic push
-	#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-			if( Gestalt(gestaltSystemVersionBugFix, reinterpret_cast<SInt32*>( &(instance()->mOSBugFixVersion) ) ) != noErr )
-				throw SystemExcFailedQuery();
-	#pragma clang diagnostic pop
-		}
+		NSOperatingSystemVersion version = [[NSProcessInfo processInfo] operatingSystemVersion];
+		instance()->mOSBugFixVersion = (int32_t)version.patchVersion;
 #elif defined( CINDER_MSW_DESKTOP )
 		::OSVERSIONINFOEX info;
 		::ZeroMemory( &info, sizeof( OSVERSIONINFOEX ) );
